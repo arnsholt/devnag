@@ -4,23 +4,13 @@ function render_dn(e) {
 
     var chunks = input.split(/\s+/g);
 
-    //var data = "";
     output.textContent = "";
     var dns = [];
     for(var i = 0; i < chunks.length; i++) {
-        //output.textContent += "Chunk " + i + ": " + chunks[i];
-        //output.textContent += encode(chunks[i].match(/(([kgcjpb]|\.?[td])h?)|\.?[nmhrlo]|[~"]n|[yv]|[".]s|[aAiIuUe]|ai|au|\.R|\|\||\||./g));
-        dns.push(encode(chunks[i].match(/(([kgcjpb]|\.?[td])h?)|\.?[nmhrlLo]|[~"]n|[yv]|[".]s|ai|au|[aAiIuUe]|\.a|\.R|\|\||\||./g)));
-        //dns.push(encode(chunks[i].match(tokenMap.regex)));
+        dns.push(encode(chunks[i].match(tokenMap.regex)));
     }
 
-    //output.textContent += String.fromCharCode(0x0950);
-    //output.textContent = dns.join(" ");
     output.innerText = dns.join(" ");
-
-    //var dn = value.replace(/(([kgcjpb]|\.?[td])h?)|\.?[nmhrl]|[~"]n|[yv]|[".]s|[aAiIuUeo]|ai|au|\.R/g, token_mapper);
-    //output.textContent = dn;
-    //output.textContent = input.value;
 }
 
 // TODO: Support for digits.
@@ -54,30 +44,27 @@ var tokenMap = {
 
 with(tokenMap) {
     tokenMap.everything = {};
+    tokens = [];
 
     for(var k in consonants) {
         consonants[k] = String.fromCharCode(consonants[k]);
         everything[k] = consonants[k];
+        tokens.push(k);
     }
     for(var k in vowels) {
         vowels[k] = [String.fromCharCode(vowels[k][0]), vowels[k][1]? String.fromCharCode(vowels[k][1]): ""];
         everything[k] = vowels[k][0];
+        tokens.push(k);
     }
     for(var k in misc) {
         misc[k] = String.fromCharCode(misc[k]);
         everything[k] = misc[k];
+        tokens.push(k);
     }
 
-    //var tokens = [];
-    //for(var k in tokenMap.everything) {
-    //    tokens.push(k);
-    //}
-    //tokens.sort(function(a, b) { b.length - a.length });
-    //tokens.reverse();
-    //tokens.map(function(x) { p = x.replace(".", "\\."); q = p.replace("|", "\\|"); return "(" + q + ")"; });
-    //var code = tokens.join("|") + "|.";
-    //tokenMap.regex = new RegExp(code, "g");
-    //tokenMap.regex = new RegExp(tokens.join("|") + "|.", "g");
+    tokens.sort(function(a, b) { return b.length - a.length });
+    tokens = tokens.map(function(x) { p = x.replace(".", "\\."); q = p.replace(/\|/g, "\\|"); return "(" + q + ")"; });
+    tokenMap.regex = new RegExp(tokens.join("|") + "|.", "g");
 
     tokenMap.virama = misc["&"];
 }
@@ -107,9 +94,6 @@ function encode(ts) {
             out += t;
             seenCons = false;
         }
-
-        //var s = tokenMap[t[i]];
-        //out += s? s + tokenMap.virama: t[i];
     }
 
     if(seenCons) {
@@ -148,7 +132,6 @@ function make_row(rowspec, devnagp) {
         var cellspec = rowspec[i];
         var combiningp = cellspec == "&" || cellspec == ".m" || cellspec == ".h";
         cellspec = !cellspec? null:
-                    //combiningp && devnagp? String.fromCharCode(0x25cc) + tokenMap.everything[cellspec]:
                     combiningp && devnagp? tokenMap.everything['k'] + tokenMap.everything[cellspec]:
                     devnagp?  tokenMap.everything[cellspec]:
                               cellspec;
