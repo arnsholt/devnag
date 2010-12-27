@@ -1,0 +1,52 @@
+div#container {
+    width: 800px;
+    border: 1px solid black;
+}
+
+p#alphabet {
+    /*position: absolute;
+    right: 0px;
+    top: 0px;*/
+}
+
+p#alphabet > table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+p#alphabet > table > tr {
+    padding: 0px;
+    margin: 0px;
+}
+
+p#alphabet > table > tr > td {
+    width: 25px;
+}
+
+p#alphabet > table > tr.devnag {
+    border-top: 1px solid black;
+}
+
+p#alphabet > table > tr.devnag > td {
+    font-size: 100%;
+}
+
+p#alphabet > table > tr > td {
+    text-align: center;
+    /*border: 1px solid black;*/
+    border-right: 1px solid black;
+    border-spacing: 0px 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+p#alphabet > table > tr.roman > td {
+    font-size: 80%;
+    font-family: monospace;
+}
+
+/*p#alphabet > table > tr > td > code {
+    font-size: 8pt;
+    border: 1px solid red;
+    margin-top: 0px;
+}*/
