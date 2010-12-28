@@ -13,7 +13,6 @@ function render_dn(e) {
     output.innerText = dns.join(" ");
 }
 
-// TODO: Support for digits.
 var tokenMap = {
     "consonants": {
         "k":  0x0915, "kh":  0x0916, "g":  0x0917, "gh":  0x0918, "\"n": 0x0919,
