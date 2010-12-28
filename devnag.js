@@ -43,21 +43,26 @@ var tokenMap = {
     },
 };
 
+var invtable = {};
+
 with(tokenMap) {
     tokenMap.everything = {};
     tokens = [];
 
     for(var k in consonants) {
+        invtable[consonants[k]] = k;
         consonants[k] = String.fromCharCode(consonants[k]);
         everything[k] = consonants[k];
         tokens.push(k);
     }
     for(var k in vowels) {
+        invtable[vowels[k][0]] = k;
         vowels[k] = [String.fromCharCode(vowels[k][0]), vowels[k][1]? String.fromCharCode(vowels[k][1]): ""];
         everything[k] = vowels[k][0];
         tokens.push(k);
     }
     for(var k in misc) {
+        invtable[misc[k]] = k;
         misc[k] = String.fromCharCode(misc[k]);
         everything[k] = misc[k];
         tokens.push(k);
@@ -131,42 +136,49 @@ function make_row(rowspec, devnagp) {
 
     for(var i = 0; i < rowspec.length; i++) {
         var cellspec = rowspec[i];
-        var combiningp = cellspec == "&" || cellspec == ".m" || cellspec == ".h";
-        cellspec = !cellspec? null:
-                    combiningp && devnagp? tokenMap.everything['k'] + tokenMap.everything[cellspec]:
-                    devnagp?  tokenMap.everything[cellspec]:
-                              cellspec;
-        var cell = make_cell(cellspec, !devnagp);
+        if(cellspec && devnagp) {
+            if(cellspec == 0x094d // virama
+            || cellspec == 0x0902 // anusvara
+            || cellspec == 0x0903 /* visarga */) {
+                cellspec = String.fromCharCode(0x0915) + String.fromCharCode(cellspec);
+            }
+            else {
+                cellspec = String.fromCharCode(cellspec);
+            }
+        }
+        else if(cellspec && !devnagp) {
+            cellspec = invtable[cellspec];
+        }
+
+        var cell = make_cell(cellspec);
         row.appendChild(cell);
     }
 
     return row;
 }
 
-function make_cell(text, codep) {
+function make_cell(text) {
     var elem = document.createElement("td");
     if(!text) return elem;
 
     var child = document.createTextNode(text);
-    /*if(codep) {
-        var newChild = document.createElement("code");
-        newChild.appendChild(child);
-        child = newChild;
-    }*/
     elem.appendChild(child);
 
     return elem;
 }
 
 var tbl = [
-    ["k", "kh", "g", "gh", "\"n", "a", "A"],
-    ["c", "ch", "j", "jh", "~n", "i", "I"],
-    [".t", ".th", ".d", ".dh", ".n", "u", "U"],
-    ["t", "th", "d", "dh", "n", ".r", ".R"],
-    ["p", "ph", "b", "bh", "m", ".l", ".L"],
-    ["y", "r", "l", "v", null, "e", "ai"],
-    ["\"s", ".s", "s", "h", null, "o", "au"],
-    [".o", ".a", "|", "||", "&", ".m", ".h"]
+    /* Consonants. */
+    [0x0915, 0x0916, 0x0917, 0x0918, 0x0919, 0x0905, 0x0906],
+    [0x091a, 0x091b, 0x091c, 0x091d, 0x091e, 0x0907, 0x0908],
+    [0x091f, 0x0920, 0x0921, 0x0922, 0x0923, 0x0909, 0x090a],
+    [0x0924, 0x0925, 0x0926, 0x0927, 0x0928, 0x090b, 0x0960],
+    [0x092a, 0x092b, 0x092c, 0x092d, 0x092e, 0x090c, 0x0961],
+    /* Semivowels, sibilants. */
+    [0x092f, 0x0930, 0x0932, 0x0935,   null, 0x090f, 0x0910],
+    [0x0936, 0x0937, 0x0938, 0x0939,   null, 0x0913, 0x0914],
+    /* Misc. */
+    [0x0950, 0x093d, 0x0964, 0x0965, 0x094d, 0x0902, 0x0903]
 ];
 
 window.onload = function() { document.getElementById("alphabet").appendChild(make_table(tbl)); };
